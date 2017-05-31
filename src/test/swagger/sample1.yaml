@@ -16,6 +16,20 @@ info:
 basePath: /api
 
 paths:
+  /defaultSecurityTest:
+    get:
+      produces:
+      - application/json
+      operationId: securityTest
+      x-swagger-router-controller: TestController
+      parameters: []
+      security:
+        - something: []
+      responses:
+        200:
+          description: it works
+          schema:
+            type: string
   /producesTest:
     get:
       produces:

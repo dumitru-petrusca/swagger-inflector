@@ -19,6 +19,8 @@ package io.swagger.inflector.config;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.swagger.inflector.auth.AuthenticationProvider;
+import io.swagger.inflector.auth.DefaultAuthenticationProvider;
 import io.swagger.inflector.converters.InputConverter;
 import v2.io.swagger.util.Yaml;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +55,8 @@ public class Configuration {
     private List<String> inputConverters = new ArrayList<String>();
     private List<String> inputValidators = new ArrayList<String>();
     private List<String> entityProcessors = new ArrayList<String>();
+    private List<String> authenticationProviders = new ArrayList<String>();
+    private List<AuthenticationProvider> authenticationProviderInstances = new ArrayList<AuthenticationProvider>();
     private ControllerFactory controllerFactory = new DefaultControllerFactory();
     private String swaggerBase = "/";
     private Set<Direction> validatePayloads = Collections.emptySet();
@@ -153,6 +157,7 @@ public class Configuration {
             .exceptionMapper("io.swagger.inflector.utils.DefaultExceptionMapper")
             .defaultValidators()
             .defaultConverters()
+            .defaultAuthentication()
             .defaultProcessors();
     }
 
@@ -169,7 +174,12 @@ public class Configuration {
     public Configuration defaultProcessors() {
         InputConverter.getInstance().defaultValidators();
         return this;
-  }
+    }
+
+    public Configuration defaultAuthentication() {
+        authenticationProviderInstances.add(new DefaultAuthenticationProvider());
+        return this;
+    }
     
     public Configuration modelPackage(String modelPackage) {
         this.modelPackage = modelPackage;
@@ -325,6 +335,21 @@ public class Configuration {
     public void setEntityProcessors(List<String> entityProcessors) {
         this.entityProcessors = entityProcessors;
     }
+
+    public List<String> getAuthenticationProviders() {
+        return authenticationProviders;
+    }
+    public void setAuthenticationProviders(List<String> authenticationProviders) {
+        this.authenticationProviders = authenticationProviders;
+    }
+
+    public List<AuthenticationProvider> getAuthenticationProviderInstances() {
+        return authenticationProviderInstances;
+    }
+    public void setAuthenticationProviderInstances(List<AuthenticationProvider> authenticationProviderInstances) {
+        this.authenticationProviderInstances = authenticationProviderInstances;
+    }
+
 
     public List<String> getInputValidators() {
         return inputValidators;

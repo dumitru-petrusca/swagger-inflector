@@ -26,7 +26,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 public class SwaggerOperationControllerTest {
-
     @Test
     public void testFilenameExtraction() throws Exception {
 

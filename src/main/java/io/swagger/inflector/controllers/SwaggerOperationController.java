@@ -18,6 +18,7 @@ package io.swagger.inflector.controllers;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.io.Files;
+import io.swagger.inflector.auth.AuthenticationProvider;
 import io.swagger.inflector.config.Configuration;
 import io.swagger.inflector.config.ControllerFactory;
 import io.swagger.inflector.converters.ConversionException;
@@ -38,15 +39,6 @@ import io.swagger.inflector.utils.ContentTypeSelector;
 import io.swagger.inflector.utils.ReflectionUtils;
 import io.swagger.inflector.validators.ValidationException;
 import io.swagger.inflector.validators.ValidationMessage;
-
-import v2.io.swagger.models.Model;
-import v2.io.swagger.models.Operation;
-import v2.io.swagger.models.parameters.BodyParameter;
-import v2.io.swagger.models.parameters.FormParameter;
-import v2.io.swagger.models.parameters.Parameter;
-import v2.io.swagger.models.parameters.SerializableParameter;
-import v2.io.swagger.models.properties.Property;
-import v2.io.swagger.util.Json;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.fileupload.MultipartStream;
@@ -55,6 +47,14 @@ import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.process.Inflector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import v2.io.swagger.models.Model;
+import v2.io.swagger.models.Operation;
+import v2.io.swagger.models.parameters.BodyParameter;
+import v2.io.swagger.models.parameters.FormParameter;
+import v2.io.swagger.models.parameters.Parameter;
+import v2.io.swagger.models.parameters.SerializableParameter;
+import v2.io.swagger.models.properties.Property;
+import v2.io.swagger.util.Json;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -85,18 +85,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 public class SwaggerOperationController extends ReflectionUtils implements Inflector<ContainerRequestContext, Response> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerOperationController.class);
 
-    private static Set<String> commonHeaders = new HashSet<String>();
+    private static Set<String> COMMON_HEADERS = new HashSet<String>();
 
     static {
-        commonHeaders.add("Host");
-        commonHeaders.add("User-Agent");
-        commonHeaders.add("Accept");
-        commonHeaders.add("Content-Type");
-        commonHeaders.add("Content-Length");
+        COMMON_HEADERS.add("Host");
+        COMMON_HEADERS.add("User-Agent");
+        COMMON_HEADERS.add("Accept");
+        COMMON_HEADERS.add("Content-Type");
+        COMMON_HEADERS.add("Content-Length");
     }
 
     private String path;
@@ -233,7 +232,7 @@ public class SwaggerOperationController extends ReflectionUtils implements Infle
             }
             for (Iterator<String> x = ctx.getHeaders().keySet().iterator(); x.hasNext(); ) {
                 String key = x.next();
-//              if(!commonHeaders.contains(key))
+//              if(!COMMON_HEADERS.contains(key))
 //                existingKeys.add(key);
             }
             MediaType mt = requestContext.getMediaType();
@@ -488,6 +487,20 @@ public class SwaggerOperationController extends ReflectionUtils implements Infle
             if (method != null) {
                 LOGGER.info("calling method " + method + " on controller " + this.controller + " with args " + Arrays.toString(args));
                 try {
+                    if(operation.getSecurity() != null) {
+                        Boolean satisfied = null;
+                        for(AuthenticationProvider auth : getConfiguration().getAuthenticationProviderInstances()) {
+                            Boolean result = auth.satisfies(requestContext, this.operation);
+                            if(result != null) {
+                                satisfied = result;
+                                break;
+                            }
+                        }
+
+                        if(!satisfied) {
+                            throw new ApiException(new ApiError().code(401).message("unauthorized"));
+                        }
+                    }
                     Object response = method.invoke(controller, args);
                     if (response instanceof ResponseContext) {
                         ResponseContext wrapper = (ResponseContext) response;

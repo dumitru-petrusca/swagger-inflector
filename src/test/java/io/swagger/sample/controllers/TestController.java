@@ -31,6 +31,13 @@ import java.io.File;
 import java.util.List;
 
 public class TestController {
+
+    public io.swagger.inflector.models.ResponseContext securityTest(io.swagger.inflector.models.RequestContext request) throws Exception {
+        return new ResponseContext()
+                .status(200)
+                .entity("yarg");
+    }
+
     public io.swagger.inflector.models.ResponseContext uploadFile(io.swagger.inflector.models.RequestContext request, File inputFile, String stringMetadata, Integer integerMetadata) {
         if(inputFile != null) {
             stringMetadata += ": " + String.valueOf(inputFile.length());

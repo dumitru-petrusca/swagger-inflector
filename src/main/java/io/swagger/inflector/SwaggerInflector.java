@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.fasterxml.jackson.jaxrs.xml.JacksonJaxbXMLProvider;
+import io.swagger.inflector.auth.AuthenticationProvider;
+import io.swagger.inflector.auth.DefaultAuthenticationProvider;
 import io.swagger.inflector.config.Configuration;
 import io.swagger.inflector.controllers.InflectResultController;
 import io.swagger.inflector.controllers.SwaggerOperationController;
@@ -69,10 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-//import io.swagger.config.FilterFactory;
-//import io.swagger.core.filter.SwaggerSpecFilter;
-//import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 public class SwaggerInflector extends ResourceConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerInflector.class);
@@ -197,6 +195,12 @@ public class SwaggerInflector extends ResourceConfig {
         }
         else {
             FilterFactory.setFilter(new DefaultSpecFilter());
+        }
+
+        if(config.getAuthenticationProviders() == null || config.getAuthenticationProviders().size() == 0) {
+            config.setAuthenticationProviderInstances(new ArrayList<AuthenticationProvider>(){
+                {this.add(new DefaultAuthenticationProvider());}
+            });
         }
 
         if(swagger == null) {

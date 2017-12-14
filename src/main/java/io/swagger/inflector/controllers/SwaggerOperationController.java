@@ -115,13 +115,14 @@ public class SwaggerOperationController extends ReflectionUtils implements Infle
     private Provider<HttpServletRequest> requestProvider;
     private ControllerFactory controllerFactoryCache = null;
 
-    public SwaggerOperationController(Configuration config, String path, String httpMethod, Operation operation, Map<String, Model> definitions) {
+    public SwaggerOperationController(Configuration config, String path, String httpMethod, Operation operation,
+                                      Map<String, Model> definitions, InputConverter inputConverter) {
         this.setConfiguration(config);
         this.path = path;
         this.httpMethod = httpMethod;
         this.operation = operation;
         this.definitions = definitions;
-        this.validator = InputConverter.getInstance();
+        this.validator = inputConverter;
         this.method = detectMethod(operation);
         if (method == null) {
             LOGGER.debug("no method `" + methodName + "` in `" + controllerName + "` to map to, using mock response");

@@ -21,6 +21,7 @@ import io.swagger.inflector.validators.ValidationException;
 import io.swagger.models.parameters.QueryParameter;
 import io.swagger.models.properties.DoubleProperty;
 import io.swagger.models.properties.LongProperty;
+import io.swagger.test.TestUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -32,9 +33,7 @@ public class NumericValidatorTest {
 
     @BeforeClass
     public void setup() {
-        converter = InputConverter.getInstance()
-            .defaultConverters()
-            .defaultValidators();
+        converter = TestUtil.createDefaultInputConverter();
     }
 
     @Test
@@ -89,7 +88,7 @@ public class NumericValidatorTest {
         parameter.setMinimum(new BigDecimal("10.0"));
         parameter.setExclusiveMinimum(true);
 
-        InputConverter.getInstance().validate(new Integer(11), parameter);
+        converter.validate(new Integer(11), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -99,7 +98,7 @@ public class NumericValidatorTest {
         parameter.setMinimum(new BigDecimal("10.0"));
         parameter.setExclusiveMinimum(true);
 
-        InputConverter.getInstance().validate(new Integer(10), parameter);
+        converter.validate(new Integer(10), parameter);
     }
 
     @Test
@@ -109,7 +108,7 @@ public class NumericValidatorTest {
         parameter.setMaximum(new BigDecimal("10.0"));
         parameter.setExclusiveMaximum(true);
 
-        InputConverter.getInstance().validate(new Integer(9), parameter);
+        converter.validate(new Integer(9), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -119,7 +118,7 @@ public class NumericValidatorTest {
         parameter.setMaximum(new BigDecimal("10"));
         parameter.setExclusiveMaximum(true);
 
-        InputConverter.getInstance().validate(new Integer(11), parameter);
+        converter.validate(new Integer(11), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -129,7 +128,7 @@ public class NumericValidatorTest {
         parameter.setMaximum(new BigDecimal("10.0"));
         parameter.setExclusiveMaximum(true);
 
-        InputConverter.getInstance().validate(new Integer(10), parameter);
+        converter.validate(new Integer(10), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -139,7 +138,7 @@ public class NumericValidatorTest {
         parameter.setMaximum(new BigDecimal("10.0"));
         parameter.setExclusiveMaximum(true);
 
-        InputConverter.getInstance().validate("value 1", parameter);
+        converter.validate("value 1", parameter);
     }
 
     @Test
@@ -148,7 +147,7 @@ public class NumericValidatorTest {
             .name("test")
             ._enum(Arrays.asList("1", "2", "3"));
 
-        InputConverter.getInstance().validate(new Integer(3), parameter);
+        converter.validate(new Integer(3), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -157,7 +156,7 @@ public class NumericValidatorTest {
             .name("test")
             ._enum(Arrays.asList("1", "2", "3"));
 
-        InputConverter.getInstance().validate(new Integer(4), parameter);
+        converter.validate(new Integer(4), parameter);
     }
 
     @Test
@@ -167,7 +166,7 @@ public class NumericValidatorTest {
             .property(new LongProperty())
             ._enum(Arrays.asList("1", "2", "3"));
 
-        InputConverter.getInstance().validate(new Long(3), parameter);
+        converter.validate(new Long(3), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -177,7 +176,7 @@ public class NumericValidatorTest {
             .property(new LongProperty())
             ._enum(Arrays.asList("1", "2", "3"));
 
-        InputConverter.getInstance().validate(new Long(4), parameter);
+        converter.validate(new Long(4), parameter);
     }
 
     @Test
@@ -190,7 +189,7 @@ public class NumericValidatorTest {
                 new Double(2).toString(),
                 new Double(3).toString()));
 
-        InputConverter.getInstance().validate(new Double(3), parameter);
+        converter.validate(new Double(3), parameter);
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -203,6 +202,6 @@ public class NumericValidatorTest {
                 new Double(2).toString(),
                 new Double(3).toString()));
 
-        InputConverter.getInstance().validate(new Double(4), parameter);
+        converter.validate(new Double(4), parameter);
     }
 }

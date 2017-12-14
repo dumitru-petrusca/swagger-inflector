@@ -73,6 +73,7 @@ import java.util.TreeSet;
 public class SwaggerInflector extends ResourceConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerInflector.class);
     private Configuration config;
+    private InputConverter inputConverter = new InputConverter();
     private String basePath;
     private String originalBasePath;
     private ServletContext servletContext;
@@ -248,47 +249,46 @@ public class SwaggerInflector extends ResourceConfig {
         }
 
         // validators
-        if (config.getInputValidators() != null && config.getInputValidators().size() > 0) {
-            InputConverter.getInstance().getValidators().clear();
-            for (String inputValidator : config.getInputValidators()) {
-                try {
-                    String clsName = inputValidator;
-                    if ("requiredFieldValidator".equalsIgnoreCase(inputValidator)) {
-                        clsName = "io.swagger.inflector.validators.DefaultValidator";
-                    }
-                    if ("numericValidator".equalsIgnoreCase(inputValidator)) {
-                        clsName = "io.swagger.inflector.validators.NumericValidator";
-                    }
-                    if ("stringValidator".equalsIgnoreCase(inputValidator)) {
-                        clsName = "io.swagger.inflector.validators.StringTypeValidator";
-                    }
-                    InputConverter.getInstance().addValidator((Validator) Class.forName(clsName).newInstance());
-                } catch (Exception e) {
-                    LOGGER.warn("unable to add validator `" + inputValidator + "`");
-                    e.printStackTrace();
+        List<String> inputValidators = config.getInputValidators();
+        if (inputValidators == null || inputValidators.isEmpty()) {
+            inputValidators = config.defaultValidators().getInputValidators();
+        }
+        for (String inputValidator : inputValidators) {
+            try {
+                String clsName = inputValidator;
+                if ("requiredFieldValidator".equalsIgnoreCase(inputValidator)) {
+                    clsName = "io.swagger.inflector.validators.DefaultValidator";
                 }
+                if ("numericValidator".equalsIgnoreCase(inputValidator)) {
+                    clsName = "io.swagger.inflector.validators.NumericValidator";
+                }
+                if ("stringValidator".equalsIgnoreCase(inputValidator)) {
+                    clsName = "io.swagger.inflector.validators.StringTypeValidator";
+                }
+                inputConverter.addValidator((Validator) Class.forName(clsName).newInstance());
+            } catch (Exception e) {
+                LOGGER.warn("unable to add validator `" + inputValidator + "`");
+                e.printStackTrace();
             }
-        } else {
-            InputConverter.getInstance().defaultValidators();
         }
 
         // converters
-        if (config.getInputConverters() != null && config.getInputConverters().size() > 0) {
-            InputConverter.getInstance().getConverters().clear();
-            for (String converter : config.getInputConverters()) {
-                try {
-                    String clsName = converter;
-                    if ("defaultConverter".equalsIgnoreCase(converter)) {
-                        clsName = "io.swagger.inflector.converters.DefaultConverter";
-                    }
-                    LOGGER.debug("adding converter `" + clsName + "`");
-                    InputConverter.getInstance().addConverter((Converter) Class.forName(clsName).newInstance());
-                } catch (Exception e) {
-                    LOGGER.warn("unable to add validator `" + converter + "`");
+        List<String> inputConverters = config.getInputConverters();
+        if (inputConverters == null || inputConverters.isEmpty()) {
+            inputConverters = config.defaultConverters().getInputConverters();
+        }
+        for (String converter : inputConverters) {
+            try {
+                String clsName = converter;
+                if ("defaultConverter".equalsIgnoreCase(converter)) {
+                    clsName = "io.swagger.inflector.converters.DefaultConverter";
                 }
+                LOGGER.debug("adding converter `" + clsName + "`");
+                inputConverter.addConverter((Converter) Class.forName(clsName).newInstance());
+            } catch (Exception e) {
+                LOGGER.warn("unable to add validator `" + converter + "`");
+                e.printStackTrace();
             }
-        } else {
-            InputConverter.getInstance().defaultConverters();
         }
 
         InflectResult result = new InflectResult();
@@ -421,7 +421,7 @@ public class SwaggerInflector extends ResourceConfig {
 
     private void addOperation(String pathString, Resource.Builder builder, String method, Operation operation, Map<String, Model> definitions) {
         LOGGER.debug("adding operation for `" + pathString + "` " + method);
-        SwaggerOperationController controller = new SwaggerOperationController(config, pathString, method, operation, definitions);
+        SwaggerOperationController controller = new SwaggerOperationController(config, pathString, method, operation, definitions, inputConverter);
         if (controller.getMethod() == null) {
             if (controller.getMethodName() != null) {
                 List<String> missingMethods = missingOperations.get(controller.getControllerName());

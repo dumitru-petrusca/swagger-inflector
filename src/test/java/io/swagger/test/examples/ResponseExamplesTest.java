@@ -23,6 +23,7 @@ import io.swagger.inflector.processors.JsonNodeExampleSerializer;
 import io.swagger.models.Operation;
 import io.swagger.models.Swagger;
 import io.swagger.parser.SwaggerParser;
+import io.swagger.test.TestUtil;
 import io.swagger.util.Json;
 import io.swagger.util.Yaml;
 import org.testng.annotations.Test;
@@ -56,7 +57,8 @@ public class ResponseExamplesTest {
         Operation operation = swagger.getPath( "/mockResponses/responseWithExamples").getGet();
 
         SwaggerOperationController controller = new SwaggerOperationController(
-            config, "/mockResponses/responseWithExamples", "GET", operation, swagger.getDefinitions() );
+            config, "/mockResponses/responseWithExamples", "GET", operation, swagger.getDefinitions(),
+                TestUtil.createDefaultInputConverter() );
 
         ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
         UriInfo uriInfo = mock( UriInfo.class );
@@ -83,7 +85,8 @@ public class ResponseExamplesTest {
         Operation operation = swagger.getPath( "/mockResponses/responseWithExamples").getGet();
 
         SwaggerOperationController controller = new SwaggerOperationController(
-            config, "/mockResponses/responseWithExamples", "GET", operation, swagger.getDefinitions() );
+            config, "/mockResponses/responseWithExamples", "GET", operation, swagger.getDefinitions(),
+                TestUtil.createDefaultInputConverter());
 
         ContainerRequestContext requestContext = mock(ContainerRequestContext.class);
         UriInfo uriInfo = mock( UriInfo.class );

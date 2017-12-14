@@ -26,6 +26,7 @@ import io.swagger.models.properties.StringProperty;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.test.TestUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.testng.annotations.BeforeClass;
@@ -36,9 +37,7 @@ public class StringTypeValidatorTest {
   
     @BeforeClass
     public void setup() {
-        converter = InputConverter.getInstance()
-            .defaultConverters()
-            .defaultValidators();
+        converter = TestUtil.createDefaultInputConverter();
     }
 
     @Test

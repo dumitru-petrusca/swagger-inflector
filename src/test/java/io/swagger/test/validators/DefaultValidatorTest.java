@@ -22,6 +22,7 @@ import io.swagger.inflector.validators.*;
 import io.swagger.models.parameters.*;
 import io.swagger.models.properties.*;
 
+import io.swagger.test.TestUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -32,9 +33,7 @@ public class DefaultValidatorTest {
   
     @BeforeClass
     public void setup() {
-        converter = InputConverter.getInstance()
-            .defaultConverters()
-            .defaultValidators();
+        converter = TestUtil.createDefaultInputConverter();
     }
     
     @Test

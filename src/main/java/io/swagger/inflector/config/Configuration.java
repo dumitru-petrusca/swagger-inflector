@@ -20,7 +20,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import io.swagger.inflector.converters.DefaultConverter;
 import io.swagger.inflector.converters.InputConverter;
+import io.swagger.inflector.validators.DefaultValidator;
+import io.swagger.inflector.validators.NumericValidator;
+import io.swagger.inflector.validators.StringTypeValidator;
 import io.swagger.util.Yaml;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -160,17 +164,21 @@ public class Configuration {
     }
 
     public Configuration defaultValidators() {
-        InputConverter.getInstance().defaultValidators();
+        inputValidators.add(DefaultValidator.class.getName());
+        inputValidators.add(NumericValidator.class.getName());
+        inputValidators.add(StringTypeValidator.class.getName());
         return this;
     }
 
     public Configuration defaultConverters() {
-        InputConverter.getInstance().defaultConverters();
+        inputConverters.add(DefaultConverter.class.getName());
         return this;
     }
 
     public Configuration defaultProcessors() {
-        InputConverter.getInstance().defaultValidators();
+        entityProcessors.add("json");
+        entityProcessors.add("yaml");
+        entityProcessors.add("xml");
         return this;
   }
     
